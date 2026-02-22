@@ -61,17 +61,44 @@ async def async_setup_entry(
         host,
     )
 
-    # Authenticate (blocking I/O)
-    try:
-        logged_in = await hass.async_add_executor_job(api.get_login_cookie)
-    except PageFetcherConnectionError as err:
-        raise ConfigEntryNotReady(
-            f"Connection failed during login to {host}: {err}"
-        ) from err
-    except (LoginFailedError, NotLoggedInError) as err:
-        raise ConfigEntryAuthFailed(
-            f"Authentication failed for {host}: {err}"
-        ) from err
+    # Authenticate (blocking I/O).
+    # Retry once with a fresh login page if the first attempt fails, because
+    # the cached page from autodetect_model() may carry a stale 'rand' CSRF
+    # token (e.g. another session loaded the switch UI in the meantime).
+    logged_in = False
+    for attempt in range(2):
+        try:
+            logged_in = await hass.async_add_executor_job(api.get_login_cookie)
+        except PageFetcherConnectionError as err:
+            raise ConfigEntryNotReady(
+                f"Connection failed during login to {host}: {err}"
+            ) from err
+        except (LoginFailedError, NotLoggedInError) as err:
+            if attempt == 0:
+                _LOGGER.debug(
+                    "Login attempt 1 failed for %s, retrying with fresh page",
+                    host,
+                )
+                try:
+                    api._page_fetcher.clear_login_page_response()
+                except AttributeError:
+                    pass
+                continue
+            raise ConfigEntryAuthFailed(
+                f"Authentication failed for {host}: {err}"
+            ) from err
+
+        if logged_in:
+            break
+
+        if attempt == 0:
+            _LOGGER.debug(
+                "Login returned False for %s, retrying with fresh page", host
+            )
+            try:
+                api._page_fetcher.clear_login_page_response()
+            except AttributeError:
+                pass
 
     if not logged_in:
         raise ConfigEntryAuthFailed(f"Login failed for {host}")

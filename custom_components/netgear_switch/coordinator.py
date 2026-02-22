@@ -46,6 +46,16 @@ class NetgearSwitchCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 )
             except NotLoggedInError:
                 _LOGGER.debug("Session expired, re-authenticating")
+                # Clear the cached login page so get_login_cookie() fetches
+                # a fresh one with a current 'rand' CSRF token.  Without this
+                # the library reuses the stale page from initial setup and the
+                # password hash won't match what the switch expects.
+                try:
+                    self.api._page_fetcher.clear_login_page_response()
+                except AttributeError:
+                    _LOGGER.debug(
+                        "Could not clear cached login page (library API change?)"
+                    )
                 try:
                     logged_in = await self.hass.async_add_executor_job(
                         self.api.get_login_cookie
