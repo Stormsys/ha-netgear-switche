@@ -9,6 +9,7 @@ from typing import Any, TypeAlias
 from py_netgear_plus import (
     LoginFailedError,
     NetgearSwitchConnector,
+    NotLoggedInError,
     PageFetcherConnectionError,
     SwitchModelNotDetectedError,
 )
@@ -67,7 +68,7 @@ async def async_setup_entry(
         raise ConfigEntryNotReady(
             f"Connection failed during login to {host}: {err}"
         ) from err
-    except LoginFailedError as err:
+    except (LoginFailedError, NotLoggedInError) as err:
         raise ConfigEntryAuthFailed(
             f"Authentication failed for {host}: {err}"
         ) from err

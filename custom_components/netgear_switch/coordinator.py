@@ -50,7 +50,7 @@ class NetgearSwitchCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     logged_in = await self.hass.async_add_executor_job(
                         self.api.get_login_cookie
                     )
-                except LoginFailedError as err:
+                except (LoginFailedError, NotLoggedInError) as err:
                     raise ConfigEntryAuthFailed(
                         f"Re-authentication rejected: {err}"
                     ) from err

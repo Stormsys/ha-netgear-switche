@@ -8,6 +8,21 @@
           "host": "Host",
           "password": "Password"
         }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Netgear Switch",
+        "description": "The switch at {host} rejected the saved credentials. Please enter the current password.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Netgear Switch",
+        "description": "Update the connection settings for this switch.",
+        "data": {
+          "host": "Host",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -16,7 +31,9 @@
       "unknown": "An unexpected error occurred."
     },
     "abort": {
-      "already_configured": "This switch is already configured."
+      "already_configured": "This switch is already configured.",
+      "reauth_successful": "Re-authentication successful.",
+      "reconfigure_successful": "Reconfiguration successful."
     }
   },
   "entity": {
