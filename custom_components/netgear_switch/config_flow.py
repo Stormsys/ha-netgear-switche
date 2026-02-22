@@ -30,6 +30,7 @@ def _try_connect(host: str, password: str) -> dict[str, Any]:
     Raises CannotConnect or InvalidAuth on failure.
     """
     from py_netgear_plus import (
+        LoginFailedError,
         NetgearSwitchConnector,
         PageFetcherConnectionError,
         SwitchModelNotDetectedError,
@@ -60,18 +61,40 @@ def _try_connect(host: str, password: str) -> dict[str, Any]:
         _LOGGER.exception("Unexpected error detecting model at %s", host)
         raise CannotConnect
 
-    try:
-        login_ok = api.get_login_cookie()
-        _LOGGER.debug("Login result for %s: %s", host, login_ok)
-    except PageFetcherConnectionError:
-        _LOGGER.error("Connection lost during login to %s", host)
-        raise CannotConnect
-    except Exception:
-        _LOGGER.exception("Unexpected error during login to %s", host)
-        raise CannotConnect
+    # Attempt login, retrying once with a fresh login page on soft failure.
+    # A retry helps when the cached login page has a stale 'rand' token or
+    # when a concurrent session (e.g. the switch web UI) caused rejection.
+    login_ok = False
+    for attempt in range(2):
+        try:
+            login_ok = api.get_login_cookie()
+            _LOGGER.debug(
+                "Login result for %s (attempt %d): %s", host, attempt + 1, login_ok
+            )
+        except LoginFailedError as err:
+            _LOGGER.error("Login rejected by %s: %s", host, err)
+            raise InvalidAuth
+        except PageFetcherConnectionError:
+            _LOGGER.error("Connection lost during login to %s", host)
+            raise CannotConnect
+        except Exception:
+            _LOGGER.exception("Unexpected error during login to %s", host)
+            raise CannotConnect
+
+        if login_ok:
+            break
+
+        if attempt == 0:
+            _LOGGER.debug(
+                "Login failed for %s, retrying with fresh login page", host
+            )
 
     if not login_ok:
-        _LOGGER.error("Login failed for %s (wrong password?)", host)
+        _LOGGER.error(
+            "Login failed for %s (check password — avoid non-ASCII special "
+            "characters if possible)",
+            host,
+        )
         raise InvalidAuth
 
     unique_id = api.get_unique_id()

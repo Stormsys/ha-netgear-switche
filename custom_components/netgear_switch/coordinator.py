@@ -8,6 +8,7 @@ from datetime import timedelta
 from typing import Any
 
 from py_netgear_plus import (
+    LoginFailedError,
     NetgearSwitchConnector,
     NotLoggedInError,
     PageFetcherConnectionError,
@@ -49,6 +50,10 @@ class NetgearSwitchCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     logged_in = await self.hass.async_add_executor_job(
                         self.api.get_login_cookie
                     )
+                except LoginFailedError as err:
+                    raise ConfigEntryAuthFailed(
+                        f"Re-authentication rejected: {err}"
+                    ) from err
                 except PageFetcherConnectionError as err:
                     raise UpdateFailed(
                         f"Connection failed during re-auth: {err}"

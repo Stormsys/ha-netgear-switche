@@ -12,7 +12,7 @@
     },
     "error": {
       "cannot_connect": "Cannot connect to the switch. Check the IP address and ensure the switch is reachable.",
-      "invalid_auth": "Invalid password. Please check your credentials.",
+      "invalid_auth": "Login failed. Please check your password (avoid non-ASCII special characters). Also ensure the switch web UI is not open in another browser.",
       "unknown": "An unexpected error occurred."
     },
     "abort": {
