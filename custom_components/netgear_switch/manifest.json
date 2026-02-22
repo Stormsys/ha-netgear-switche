@@ -1,0 +1,11 @@
+{
+  "domain": "netgear_switch",
+  "name": "Netgear Managed Switch",
+  "codeowners": ["@stormsys"],
+  "config_flow": true,
+  "documentation": "https://github.com/stormsys/ha-netgear-switch",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/stormsys/ha-netgear-switch/issues",
+  "requirements": ["py-netgear-plus==0.4.7"],
+  "version": "0.1.0"
+}

@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Netgear Switch",
+        "description": "Enter the IP address and password for your Netgear managed switch.",
+        "data": {
+          "host": "Host",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the switch. Check the IP address and ensure the switch is reachable.",
+      "invalid_auth": "Invalid password. Please check your credentials.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This switch is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "switch_name": { "name": "Switch name" },
+      "switch_firmware": { "name": "Firmware version" },
+      "switch_serial_number": { "name": "Serial number" },
+      "switch_bootloader": { "name": "Bootloader version" },
+      "response_time": { "name": "Response time" },
+      "port_connection_speed": { "name": "Port {port} connection speed" },
+      "port_speed_io": { "name": "Port {port} IO speed" },
+      "port_speed_rx": { "name": "Port {port} RX speed" },
+      "port_speed_tx": { "name": "Port {port} TX speed" },
+      "port_traffic_rx": { "name": "Port {port} traffic RX" },
+      "port_traffic_tx": { "name": "Port {port} traffic TX" },
+      "port_sum_rx": { "name": "Port {port} total RX" },
+      "port_sum_tx": { "name": "Port {port} total TX" },
+      "sum_speed_io": { "name": "Total IO speed" },
+      "sum_speed_rx": { "name": "Total RX speed" },
+      "sum_speed_tx": { "name": "Total TX speed" },
+      "sum_traffic_rx": { "name": "Total traffic RX" },
+      "sum_traffic_tx": { "name": "Total traffic TX" },
+      "sum_crc_errors": { "name": "Total CRC errors" }
+    },
+    "binary_sensor": {
+      "port_link_status": { "name": "Port {port} link" }
+    }
+  }
+}
